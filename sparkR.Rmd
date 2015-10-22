@@ -1,1 +1,77 @@
+we will use built in data frae in R< for sparkR dataframe purpose.
+This DataFrame includes 32 observations on 11 variables.
+
+[, 1] mpg Miles/(US) --> gallon
+[, 2] cyl --> Number of cylinders
+[, 3] disp --> Displacement (cu.in.)
+[, 4] hp --> Gross horsepower
+[, 5] drat --> Rear axle ratio
+[, 6] wt --> Weight (lb/1000)
+[, 7] qsec --> 1/4 mile time
+[, 8] vs --> V/S
+[, 9] am --> Transmission (0 = automatic, 1 = manual)
+[,10] gear --> Number of forward gears
+[,11] carb --> Number of carburetors 
+
+```{r}
+load(mtcars)
+library(sparkR)
+head(mtcars)
+
+## Initialize SQLContext. To work with dataframes we need a SQLContext which is created using `sparkRSQL.init(sp)`. SQLContext uses #SparkContext named `sp` here.Create the sp context for the purpose.
+sqlContext <- sparkRSQL.init(sp)
+
+## With SQLContext and a loaded local DataFrame, we create a Spark DataFrame:
+sdf <- createDataFrame(sqlContext, mtcars) 
+printSchema(sdf)
+```
+
+##Displays the content of the DataFrame
+
+```{r}
+SparkR::head(sdf)
+```
+
+## Selecting columns
+
+```{r}
+SparkR::head(select(sdf, sdf$mpg ))
+```
+##Filtering Data
+
+```{r}
+SparkR::head(SparkR::filter(sdf, sdf$mpg < 18))
+```
+
+## Operating on Columns
+
+```{r}
+# converting lb to metric ton- eneral airthmetics
+
+sdf$wtTon <- sdf$wt * 0.45
+SparkR::head(sdf)
+```
+
+##Grouping, Aggregation
+-SparkR data frames support a number of commonly used functions to aggregate data after grouping. For example we can compute the average weight of cars by their cylinders as shown below:
+
+```{r}
+SparkR::head(summarize(groupBy(sdf, sdf$cyl), wtavg = avg(sdf$wtTon)))
+# We can also sort the output from the aggregation to get the most common cars
+car_counts <-summarize(groupBy(sdf, sdf$cyl), count = n(sdf$wtTon))
+SparkR::head(arrange(car_counts, desc(car_counts$count)))
+```
+
+##Running SQL Queries from Spark DataFrames
+-A Spark DataFrame can also be registered as a temporary table in Spark SQL and registering a DataFrame as a table allows you to run SQL queries over its data. The sql function enables applications to run SQL queries programmatically and returns the result as a DataFrame.
+
+```{r}
+# Register this DataFrame as a table.
+registerTempTable(sdf, "cars")
+# SQL statements can be run by using the sql method
+highgearcars <- sql(sqlContext, "SELECT gear FROM cars WHERE cyl >= 4 AND cyl <= 9")
+SparkR::head(highgearcars)
+```
+
+
 
