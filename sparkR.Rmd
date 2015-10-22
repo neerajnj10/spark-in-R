@@ -1,4 +1,6 @@
-we will use built in data frae in R< for sparkR dataframe purpose.
+#we will use built in data frame in R for sparkR dataframe purpose.
+
+
 This DataFrame includes 32 observations on 11 variables.
 
 [, 1] mpg Miles/(US) --> gallon
