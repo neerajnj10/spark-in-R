@@ -20,8 +20,8 @@ load(mtcars)
 library(sparkR)
 head(mtcars)
 
-## Initialize SQLContext. To work with dataframes we need a SQLContext which is created using `sparkRSQL.init(sp)`. SQLContext uses #SparkContext named `sp` here.Create the sp context for the purpose.
-sqlContext <- sparkRSQL.init(sp)
+## Initialize SQLContext. To work with dataframes we need a SQLContext which is created using `sparkRSQL.init(sc)`. SQLContext uses #SparkContext named `sp` here.Create the sp context for the purpose.
+sqlContext <- sparkRSQL.init(sc)
 
 ## With SQLContext and a loaded local DataFrame, we create a Spark DataFrame:
 sdf <- createDataFrame(sqlContext, mtcars) 
